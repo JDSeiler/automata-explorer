@@ -1,26 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styled from "styled-components";
+import AutomataRunner from "./AutomataRunner";
 
-function App() {
+const CenteringContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 5%;
+  max-width: 90%;
+`;
+
+const Divider = styled.div`
+  border: 1px solid #333;
+  margin-bottom: 1rem;
+`;
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <CenteringContainer>
+      <h1 style={{flexGrow: 0, marginBottom: "0.5rem"}}>Elementary Automata Explorer</h1>
+      <Divider />
+      <AutomataRunner />
+    </CenteringContainer>
   );
-}
+};
 
 export default App;
