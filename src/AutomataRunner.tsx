@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect, useRef } from "react";
-import { CELL_SIZE, drawAutomata, fillCell, getGridSize } from "./drawing";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import { CELL_SIZE, getGridSize, setCanvas } from "./drawing";
 import styled from "styled-components";
 import { produceAutomata } from "./automata";
 
@@ -23,6 +23,7 @@ const AutomataRunner = () => {
   }, []);
 
   const [selectedAutomata, setSelectedAutomata] = useState<string>(toB(0));
+  const [seedType, setSeedType] = useState<'centered' | 'random'>('centered');
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -49,20 +50,27 @@ const AutomataRunner = () => {
 
     canvas.setAttribute('width', scaledWidth+"px");    
     canvas.setAttribute('height', scaledHeight+"px");
-    console.log(`Canvas size set to : ${scaledWidth} x ${scaledHeight}`);
   }, [canvasRef]);
 
-  useEffect(() => {
+  const drawAutomata = () => {
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
     }
 
     const gridSize = getGridSize(canvas);
-    const automataHistory = produceAutomata(selectedAutomata, gridSize);
-    // fillCell(canvas, 94, 0);
-    drawAutomata(canvas, automataHistory);
-  }, [selectedAutomata, canvasRef]);
+    const { automataHistory, automataImage } = produceAutomata(selectedAutomata, seedType, gridSize);
+    // paintCanvas uses repeated `fillRect` calls to paint the automata, it's
+    // really quite slow.
+    // paintCanvas(canvas, automataHistory);
+
+    // setCanvas takes an ImageData and dumps it to the screen.
+    setCanvas(canvas, automataImage);
+  }
+
+  useEffect(() => {
+    drawAutomata();
+  }, [selectedAutomata, seedType, canvasRef]);
 
   return (
     <div>
@@ -79,9 +87,9 @@ const AutomataRunner = () => {
             setSelectedAutomata(e.target.value);
           }}
           style={{
-
             fontFamily: 'inherit',
-            marginLeft: '0.25rem'
+            marginLeft: '0.25rem',
+            marginRight: '0.75rem'
           }}
         >
           {range.map((i) => {
@@ -92,6 +100,34 @@ const AutomataRunner = () => {
             );
           })}
         </select>
+
+        <label htmlFor="seedType">Seed type:</label>
+        <select
+          name="seedType"
+          id="seed-type"
+          value={seedType}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            setSeedType(e.target.value as ('centered' | 'random'));
+          }}
+          style={{
+            fontFamily: 'inherit',
+            marginLeft: '0.25rem',
+            marginRight: '0.75rem'
+          }}
+        >
+          <option value="centered" key="centered">{'Centered'}</option>
+          <option value="random" key="random">{'Random'}</option>
+        </select>
+        <button
+          onClick={() => {
+            drawAutomata();
+          }}
+          style={{
+            fontFamily: 'inherit'
+          }}
+        >
+          {'Refresh'}
+        </button>
       </Header>
       <div style={{display: 'flex', justifyContent: 'center'}}>
         <canvas ref={canvasRef} id="automata-drawing-area" width="1500" height="500" style={{border: "1px solid black"}}>

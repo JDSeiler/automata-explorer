@@ -1,5 +1,15 @@
 type Canvas = HTMLCanvasElement;
 
+/*
+A lot of this drawing code is defunct now that I'm
+just using `putImageData` to draw the final picture.
+
+But I'll keep it around for now in case it's useful when
+I eventually try to animate the progress of the automata.
+
+*/
+
+
 export const CELL_SIZE = 1;
 
 const convertIndicesToCoordinates = (i: number, j: number): [number, number] => {
@@ -35,7 +45,7 @@ export const clearCanvas = (c: Canvas) => {
   ctx!.fillStyle = "#000";
 }
 
-export const drawAutomata = (c: Canvas, automataHistory: string[][]) => {
+export const paintCanvas = (c: Canvas, automataHistory: string[][]) => {
   clearCanvas(c);
   for (let rIdx = 0; rIdx < automataHistory.length; rIdx ++) {
     const row = automataHistory[rIdx];
@@ -45,4 +55,9 @@ export const drawAutomata = (c: Canvas, automataHistory: string[][]) => {
       }
     }
   }
+}
+
+export const setCanvas = (c: Canvas, img: ImageData) => {
+  const ctx = c.getContext('2d');
+  ctx?.putImageData(img, 0, 0);
 }
